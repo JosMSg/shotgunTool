@@ -7,9 +7,7 @@ inputID = None
 inputCode = None
 requestVersions = None
 
-sg = Shotgun("https://upgdl.shotgunstudio.com",
-                          login="ignacho",
-                          password="Minions2793")
+sg = Shotgun("https://upgdl.shotgunstudio.com", "NachoScript", "486c9aa2bf63e4a83f975e3928207342e15dfcfeb2066384d7e48f9da7087923" )
 
 """Funciones"""
 def typeVerification(typeToVerify):
@@ -66,6 +64,22 @@ def assignNewName():
 	else:
 		os.system('CLS')
 		return True
+def createNewVersion():
+	global inputCode, inputID, inputType
+	description = raw_input("Escribe una descripcion de tu version:\n")
+	data = {
+		'code': inputCode,
+		'entity': {'id': inputID, 'type':inputType},
+		'description': description,
+		'sg_task': {'id': 2252 , 'type':'Task'},
+		'user': {'id':84, 'type': 'HumanUser'},
+		'sg_status_list': 'rev',
+		'project': {'id':110, 'type':'Project'}
+	}
+	result = sg.create("Version", data)
+	newVersionId = result['id']
+
+#def addMedia():
 
 
 """Analizar respuesta: Asset o Shot"""
@@ -74,7 +88,10 @@ while not typeVerification(raw_input("Elige una de las opciones:\n-Asset\n-Shot\
 """Analizar el ID"""
 while not idVerification(raw_input("Ahora introduzca el ID del %s:\n" %inputType)):
 	print "\n---Tipo de dato invalido o inexistente. Vuelva a intentarlo---\n"
+"""Creacion de un nombre"""
 findVersions()
 while not assignNewName():
 	print ''
+"""POST request"""
+createNewVersion()
 time.sleep(5)
