@@ -1,4 +1,5 @@
 import os
+import os.path
 import time
 from shotgun_api3 import Shotgun 
 
@@ -6,6 +7,7 @@ inputType = None
 inputID = None
 inputCode = None
 requestVersions = None
+requestVersionId = None
 
 sg = Shotgun("https://upgdl.shotgunstudio.com", "NachoScript", "486c9aa2bf63e4a83f975e3928207342e15dfcfeb2066384d7e48f9da7087923" )
 
@@ -65,7 +67,7 @@ def assignNewName():
 		os.system('CLS')
 		return True
 def createNewVersion():
-	global inputCode, inputID, inputType
+	global inputCode, inputID, inputType, requestVersionId
 	description = raw_input("Escribe una descripcion de tu version:\n")
 	data = {
 		'code': inputCode,
@@ -77,10 +79,17 @@ def createNewVersion():
 		'project': {'id':110, 'type':'Project'}
 	}
 	result = sg.create("Version", data)
-	newVersionId = result['id']
+	requestVersionId = result['id']
+	print "Version created!\n"
 
-#def addMedia():
-
+def addValidMedia():
+	global requestVersionId
+	file_path = raw_input("Introduzca la ruta al archivo media a subir (incluya la extension):\n")
+	if os.path.isfile(file_path) :
+		sg.upload("Version", requestVersionId, file_path, field_name="sg_uploaded_movie", display_name="Media")
+		return True
+	else:
+		return False
 
 """Analizar respuesta: Asset o Shot"""
 while not typeVerification(raw_input("Elige una de las opciones:\n-Asset\n-Shot\n").lower()):
@@ -94,4 +103,7 @@ while not assignNewName():
 	print ''
 """POST request"""
 createNewVersion()
+while not addValidMedia():
+	print ''
+print "Todo listo\nGracias por usar esta herramienta!"
 time.sleep(5)
